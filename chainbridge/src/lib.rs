@@ -10,7 +10,7 @@ use frame_support::{
     Parameter,
 };
 
-use frame_system::{self as system, ensure_root, ensure_signed};
+use frame_system::{self as system, ensure_root, ensure_signed, Pallet};
 use sp_core::U256;
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
 use sp_runtime::{ModuleId, RuntimeDebug};
@@ -142,7 +142,7 @@ decl_event! {
 }
 
 decl_error! {
-    pub enum Error for Module<T: Config> {
+    pub enum Error for Pallet<T: Config> {
         /// Relayer threshold not set
         ThresholdNotSet,
         /// Provided chain Id is not valid
@@ -440,7 +440,7 @@ impl<T: Config> Module<T> {
         prop: Box<T::Proposal>,
         in_favour: bool,
     ) -> DispatchResult {
-        let now = <frame_system::Module<T>>::block_number();
+        let now = <frame_system::Pallet<T>>::block_number();
         let mut votes = match <Votes<T>>::get(src_id, (nonce, prop.clone())) {
             Some(v) => v,
             None => {
@@ -475,7 +475,7 @@ impl<T: Config> Module<T> {
         prop: Box<T::Proposal>,
     ) -> DispatchResult {
         if let Some(mut votes) = <Votes<T>>::get(src_id, (nonce, prop.clone())) {
-            let now = <frame_system::Module<T>>::block_number();
+            let now = <frame_system::Pallet<T>>::block_number();
             ensure!(!votes.is_complete(), Error::<T>::ProposalAlreadyComplete);
             ensure!(!votes.is_expired(now), Error::<T>::ProposalExpired);
 
