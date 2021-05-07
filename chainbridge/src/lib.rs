@@ -1,19 +1,12 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{
-    decl_error, decl_event, decl_module, decl_storage,
-    dispatch::DispatchResult,
-    ensure,
-    traits::{EnsureOrigin, Get},
-    weights::{GetDispatchInfo, Pays},
-    Parameter,
-};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, traits::{EnsureOrigin, Get}, weights::{GetDispatchInfo, Pays}, Parameter, PalletId};
 
 use frame_system::{self as system, ensure_root, ensure_signed};
 use sp_core::U256;
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
-use sp_runtime::{ModuleId, RuntimeDebug};
+use sp_runtime::{RuntimeDebug};
 use sp_std::prelude::*;
 
 use codec::{Decode, Encode, EncodeLike};
@@ -22,7 +15,7 @@ mod mock;
 mod tests;
 
 const DEFAULT_RELAYER_THRESHOLD: u32 = 1;
-const MODULE_ID: ModuleId = ModuleId(*b"cb/bridg");
+const MODULE_ID: PalletId = PalletId(*b"cb/bridg");
 
 pub type ChainId = u8;
 pub type DepositNonce = u64;
