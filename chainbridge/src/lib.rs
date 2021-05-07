@@ -10,7 +10,8 @@ use frame_support::{
     Parameter,
 };
 
-use frame_system::{self as system, ensure_root, ensure_signed, Pallet};
+use crate::system::Pallet;
+use frame_system::{self as system, ensure_root, ensure_signed};
 use sp_core::U256;
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
 use sp_runtime::{ModuleId, RuntimeDebug};
