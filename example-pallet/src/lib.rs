@@ -120,6 +120,7 @@ decl_module! {
             let source = T::BridgeOrigin::ensure_origin(origin)?;
             // mint token to the source before sending to
             T::Currency::deposit(AssetId::CHAINSAFE(token_addr), &source,amount)?;
+            T::Currency::transfer(AssetId::CHAINSAFE(token_addr),&source, &to, amount)?;
             Ok(())
         }
 
