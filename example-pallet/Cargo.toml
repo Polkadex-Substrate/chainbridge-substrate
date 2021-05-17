@@ -22,6 +22,8 @@ frame-system = { version = "3.0.0", default-features = false , git = "https://gi
 
 chainbridge = { path = "../chainbridge" , default-features = false}
 example-erc721 = { path = "../example-erc721", default-features = false }
+polkadex-primitives = { path = "../primitives", default-features = false }
+orml-traits = { git = "https://github.com/Polkadex-Substrate/open-runtime-module-library.git", default-features = false }
 
 [dev-dependencies]
 pallet-balances = { version = "3.0.0", default-features = false , git = "https://github.com/paritytech/substrate.git"}
@@ -41,5 +43,7 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"chainbridge/std",
-    "example-erc721/std"
+    "example-erc721/std",
+	'polkadex-primitives/std',
+	'orml-traits/std',
 ]
