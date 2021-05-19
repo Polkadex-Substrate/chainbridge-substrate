@@ -3,19 +3,19 @@
 
 use chainbridge as bridge;
 use example_erc721 as erc721;
-use frame_support::traits::{Currency, EnsureOrigin, ExistenceRequirement::AllowDeath, Get};
 use frame_support::pallet_prelude::*;
+use frame_support::traits::{Currency, EnsureOrigin, ExistenceRequirement::AllowDeath, Get};
 use frame_system::{self as system, ensure_signed};
-use sp_arithmetic::traits::SaturatedConversion;
-use sp_core::{U256,H160};
-use sp_std::prelude::*;
 use polkadex_primitives::assets::AssetId;
+use sp_arithmetic::traits::SaturatedConversion;
+use sp_core::{H160, U256};
+use sp_std::prelude::*;
 mod mock;
+use frame_support::sp_runtime::traits::AtLeast32BitUnsigned;
 use frame_support::{
-    debug, decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult
+    debug, decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult,
 };
 use orml_traits::{MultiCurrency, MultiCurrencyExtended};
-use frame_support::sp_runtime::traits::AtLeast32BitUnsigned;
 
 mod tests;
 
@@ -27,11 +27,11 @@ pub trait Config: system::Config + bridge::Config + erc721::Config {
     type BridgeOrigin: EnsureOrigin<Self::Origin, Success = Self::AccountId>;
 
     type Balance: Parameter
-    + Member
-    + AtLeast32BitUnsigned
-    + Default
-    + Copy
-    + MaybeSerializeDeserialize;
+        + Member
+        + AtLeast32BitUnsigned
+        + Default
+        + Copy
+        + MaybeSerializeDeserialize;
 
     /// The currency mechanism.
     type Currency: MultiCurrencyExtended<
@@ -84,13 +84,13 @@ decl_module! {
 
         /// Transfers some amount of the native token to some recipient on a (whitelisted) destination chain.
         #[weight = 195_000_000]
-        pub fn transfer_native(origin, amount: T::Balance, recipient: Vec<u8>, dest_id: bridge::ChainId) -> DispatchResult {
+        pub fn transfer_native(origin, token_addr: H160, amount: T::Balance, recipient: Vec<u8>, dest_id: bridge::ChainId) -> DispatchResult {
             let source = ensure_signed(origin)?;
             ensure!(<bridge::Module<T>>::chain_whitelisted(dest_id), Error::<T>::InvalidTransfer);
             let bridge_id = <bridge::Module<T>>::account_id();
             T::Currency::transfer(AssetId::POLKADEX,&source, &bridge_id, amount)?;
             let resource_id = T::NativeTokenId::get();
-            <bridge::Module<T>>::transfer_fungible(dest_id, resource_id, recipient, U256::from(amount.saturated_into::<u128>()))
+            <bridge::Module<T>>::transfer_fungible(dest_id, resource_id, recipient, token_addr, U256::from(amount.saturated_into::<u128>()))
         }
 
         /// Transfer a non-fungible token (erc721) to a (whitelisted) destination chain.
@@ -116,7 +116,7 @@ decl_module! {
 
         /// Executes a simple currency transfer using the bridge account as the source
         #[weight = 195_000_000]
-        pub fn transfer(origin, to: T::AccountId, token_addr : H160, amount: T::Balance, r_id: ResourceId) -> DispatchResult {
+        pub fn transfer(origin, to: T::AccountId, token_addr: H160, amount: T::Balance, r_id: ResourceId) -> DispatchResult {
             let source = T::BridgeOrigin::ensure_origin(origin)?;
             // mint token to the source before sending to
             T::Currency::deposit(AssetId::CHAINSAFE(token_addr), &source,amount)?;
