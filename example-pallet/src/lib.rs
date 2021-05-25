@@ -88,7 +88,7 @@ decl_module! {
             let source = ensure_signed(origin)?;
             ensure!(<bridge::Module<T>>::chain_whitelisted(dest_id), Error::<T>::InvalidTransfer);
             let bridge_id = <bridge::Module<T>>::account_id();
-            T::Currency::transfer(AssetId::POLKADEX,&source, &bridge_id, amount)?;
+            T::Currency::transfer(AssetId::CHAINSAFE(token_addr), &source, &bridge_id, amount)?;
             let resource_id = T::NativeTokenId::get();
             <bridge::Module<T>>::transfer_fungible(dest_id, resource_id, recipient, token_addr, U256::from(amount.saturated_into::<u128>()))
         }
@@ -120,7 +120,7 @@ decl_module! {
             let source = T::BridgeOrigin::ensure_origin(origin)?;
             // mint token to the source before sending to
             T::Currency::deposit(AssetId::CHAINSAFE(token_addr), &source,amount)?;
-            T::Currency::transfer(AssetId::CHAINSAFE(token_addr),&source, &to, amount)?;
+            T::Currency::transfer(AssetId::CHAINSAFE(token_addr), &source, &to, amount)?;
             Ok(())
         }
 

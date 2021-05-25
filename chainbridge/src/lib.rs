@@ -120,7 +120,7 @@ decl_event! {
         RelayerAdded(AccountId),
         /// Relayer removed from set
         RelayerRemoved(AccountId),
-        /// FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount, recipient, metadata)
+        /// FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, token_addr, amount, recipient)
         FungibleTransfer(ChainId, DepositNonce, ResourceId, H160, U256, Vec<u8>),
         /// NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id, recipient, metadata)
         NonFungibleTransfer(ChainId, DepositNonce, ResourceId, Vec<u8>, Vec<u8>, Vec<u8>),
