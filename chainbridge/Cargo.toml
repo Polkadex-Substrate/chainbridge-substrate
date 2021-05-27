@@ -20,6 +20,7 @@ frame-support = { version = "3.0.0", default-features = false, git = "https://gi
 frame-system = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git" }
 
 pallet-balances = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git" }
+polkadex-primitives = { git = "https://github.com/Polkadex-Substrate/Polkadex.git", branch = 'develop', default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { version = "2.0.0", package = "substrate-wasm-builder-runner" }
@@ -35,4 +36,5 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-balances/std",
+	"polkadex-primitives/std",
 ]

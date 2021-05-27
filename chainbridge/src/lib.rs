@@ -15,6 +15,7 @@ use sp_core::{H160, U256};
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
 use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
+use polkadex_primitives::assets::AssetId;
 
 use codec::{Decode, Encode, EncodeLike};
 
@@ -121,7 +122,7 @@ decl_event! {
         /// Relayer removed from set
         RelayerRemoved(AccountId),
         /// FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, token_addr, amount, recipient)
-        FungibleTransfer(ChainId, DepositNonce, ResourceId, H160, U256, Vec<u8>),
+        FungibleTransfer(ChainId, DepositNonce, ResourceId, AssetId, U256, Vec<u8>),
         /// NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id, recipient, metadata)
         NonFungibleTransfer(ChainId, DepositNonce, ResourceId, Vec<u8>, Vec<u8>, Vec<u8>),
         /// GenericTransfer is for a generic data payload (dest_id, nonce, resource_id, metadata)
@@ -540,7 +541,7 @@ impl<T: Config> Module<T> {
         dest_id: ChainId,
         resource_id: ResourceId,
         to: Vec<u8>,
-        token_addr: H160,
+        asset_id: AssetId,
         amount: U256,
     ) -> DispatchResult {
         ensure!(
@@ -552,7 +553,7 @@ impl<T: Config> Module<T> {
             dest_id,
             nonce,
             resource_id,
-            token_addr,
+            asset_id,
             amount,
             to,
         ));
