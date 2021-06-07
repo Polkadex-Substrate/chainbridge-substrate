@@ -1,12 +1,19 @@
 // Ensure we're `no_std` when compiling for Wasm.
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, dispatch::DispatchResult, ensure, traits::{EnsureOrigin, Get}, weights::{GetDispatchInfo, Pays}, Parameter, PalletId};
+use frame_support::{
+    decl_error, decl_event, decl_module, decl_storage,
+    dispatch::DispatchResult,
+    ensure,
+    traits::{EnsureOrigin, Get},
+    weights::{GetDispatchInfo, Pays},
+    PalletId, Parameter,
+};
 
 use frame_system::{self as system, ensure_root, ensure_signed};
-use sp_core::U256;
+use sp_core::{H160, U256};
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
-use sp_runtime::{RuntimeDebug};
+use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
 
 use codec::{Decode, Encode, EncodeLike};
@@ -113,8 +120,8 @@ decl_event! {
         RelayerAdded(AccountId),
         /// Relayer removed from set
         RelayerRemoved(AccountId),
-        /// FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, amount, recipient, metadata)
-        FungibleTransfer(ChainId, DepositNonce, ResourceId, U256, Vec<u8>),
+        /// FunglibleTransfer is for relaying fungibles (dest_id, nonce, resource_id, token_addr, amount, recipient)
+        FungibleTransfer(ChainId, DepositNonce, ResourceId, H160, U256, Vec<u8>),
         /// NonFungibleTransfer is for relaying NFTS (dest_id, nonce, resource_id, token_id, recipient, metadata)
         NonFungibleTransfer(ChainId, DepositNonce, ResourceId, Vec<u8>, Vec<u8>, Vec<u8>),
         /// GenericTransfer is for a generic data payload (dest_id, nonce, resource_id, metadata)
@@ -533,6 +540,7 @@ impl<T: Config> Module<T> {
         dest_id: ChainId,
         resource_id: ResourceId,
         to: Vec<u8>,
+        token_addr: H160,
         amount: U256,
     ) -> DispatchResult {
         ensure!(
@@ -544,6 +552,7 @@ impl<T: Config> Module<T> {
             dest_id,
             nonce,
             resource_id,
+            token_addr,
             amount,
             to,
         ));
