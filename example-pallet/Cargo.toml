@@ -23,7 +23,7 @@ frame-system = { version = "3.0.0", default-features = false, git = "https://git
 chainbridge = { path = "../chainbridge", default-features = false }
 example-erc721 = { path = "../example-erc721", default-features = false }
 orml-traits = { git = "https://github.com/Polkadex-Substrate/open-runtime-module-library.git", default-features = false }
-polkadex-primitives = { git = "https://github.com/Polkadex-Substrate/Polkadex.git", branch = 'develop', default-features = false }
+polkadex-primitives = { git = "https://github.com/Polkadex-Substrate/polkadex-primitives.git", branch = 'main', default-features = false }
 [dev-dependencies]
 pallet-balances = { version = "3.0.0", default-features = false, git = "https://github.com/paritytech/substrate.git" }
 
