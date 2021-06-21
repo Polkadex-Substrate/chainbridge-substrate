@@ -617,6 +617,6 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureBridge<T> {
     }
     #[cfg(feature = "runtime-benchmarks")]
     fn successful_origin() -> T::Origin {
-        T::Origin::from(RawOrigin::Member(Default::default()))
+        T::Origin::from(frame_system::RawOrigin::Root)
     }
 }
