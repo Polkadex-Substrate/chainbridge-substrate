@@ -10,13 +10,14 @@ use frame_support::{
     PalletId, Parameter,
 };
 
-use frame_system::{self as system, ensure_root, ensure_signed};
+use frame_system::{self as system, ensure_root, ensure_signed, RawOrigin};
 use sp_core::{H160, U256};
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
 use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
 
 use codec::{Decode, Encode, EncodeLike};
+use frame_support::traits::OriginTrait;
 
 mod mock;
 mod tests;
@@ -603,10 +604,17 @@ impl<T: Config> Module<T> {
         Ok(())
     }
 }
+/*
+type Origin:
+			Into<Result<RawOrigin<Self::AccountId>, Self::Origin>>
+			+ From<RawOrigin<Self::AccountId>>
+			+ Clone
+			+ OriginTrait<Call=Self::Call>;
+ */
 
 /// Simple ensure origin for the bridge account
-pub struct EnsureBridge<T>(sp_std::marker::PhantomData<T>);
-impl<T: Config> EnsureOrigin<T::Origin> for EnsureBridge<T> {
+/*
+impl<T: Config, O : T::Origin> EnsureOrigin<T::Origin> for EnsureBridge<T> {
     type Success = T::AccountId;
     fn try_origin(o: T::Origin) -> Result<Self::Success, T::Origin> {
         let bridge_id = MODULE_ID.into_account();
@@ -615,8 +623,23 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureBridge<T> {
             r => Err(T::Origin::from(r)),
         })
     }
+}*/
+pub struct EnsureBridge<T>(sp_std::marker::PhantomData<T>);
+impl<
+    O: Into<Result<RawOrigin<T::AccountId>, O>> + From<RawOrigin<T::AccountId>>,
+    T :Config
+> EnsureOrigin<O> for EnsureBridge<T> {
+    type Success = T::AccountId;
+    fn try_origin(o: O) -> Result<Self::Success, O> {
+        let bridge_id = MODULE_ID.into_account();
+        o.into().and_then(|o| match o {
+            RawOrigin::Signed(who) if who == bridge_id => Ok(bridge_id),
+            r => Err(O::from(r)),
+        })
+    }
+
     #[cfg(feature = "runtime-benchmarks")]
-    fn successful_origin() -> T::Origin {
-        T::Origin::from(frame_system::RawOrigin::Root)
+    fn successful_origin() -> O {
+        O::from(RawOrigin::Signed(T::AccountId::default()))
     }
 }
