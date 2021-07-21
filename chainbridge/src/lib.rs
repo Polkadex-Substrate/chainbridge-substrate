@@ -10,14 +10,13 @@ use frame_support::{
     PalletId, Parameter,
 };
 
-use frame_system::{self as system, ensure_root, ensure_signed, RawOrigin};
+use frame_system::{self as system, ensure_root, ensure_signed, RawOrigin,};
 use sp_core::{H160, U256};
 use sp_runtime::traits::{AccountIdConversion, Dispatchable};
 use sp_runtime::RuntimeDebug;
 use sp_std::prelude::*;
 
 use codec::{Decode, Encode, EncodeLike};
-use frame_support::traits::OriginTrait;
 
 mod mock;
 mod tests;
@@ -317,7 +316,6 @@ decl_module! {
 
             Self::vote_against(who, nonce, src_id, call)
         }
-
         /// Evaluate the state of a proposal given the current vote threshold.
         ///
         /// A proposal with enough votes will be either executed or cancelled, and the status
@@ -326,7 +324,11 @@ decl_module! {
         /// # <weight>
         /// - weight of proposed call, regardless of whether execution is performed
         /// # </weight>
-        #[weight = (prop.get_dispatch_info().weight + 195_000_000, prop.get_dispatch_info().class, Pays::Yes)]
+        //#[weight = ((prop.get_dispatch_info().weight as Weight).saturation_add(195_000_000) as u64, prop.get_dispatch_info().class, Pays::Yes)]
+        #[weight = {
+            let dispatch_info = prop.get_dispatch_info();
+            (dispatch_info.weight.saturating_add(195_000_000),dispatch_info.class, Pays::Yes)
+        }]
         pub fn eval_vote_state(origin, nonce: DepositNonce, src_id: ChainId, prop: Box<<T as Config>::Proposal>) -> DispatchResult {
             ensure_signed(origin)?;
 
@@ -441,7 +443,7 @@ impl<T: Config> Module<T> {
         prop: Box<T::Proposal>,
         in_favour: bool,
     ) -> DispatchResult {
-        let now = <frame_system::Module<T>>::block_number();
+        let now = <frame_system::Pallet<T>>::block_number();
         let mut votes = match <Votes<T>>::get(src_id, (nonce, prop.clone())) {
             Some(v) => v,
             None => {
@@ -476,7 +478,7 @@ impl<T: Config> Module<T> {
         prop: Box<T::Proposal>,
     ) -> DispatchResult {
         if let Some(mut votes) = <Votes<T>>::get(src_id, (nonce, prop.clone())) {
-            let now = <frame_system::Module<T>>::block_number();
+            let now = <frame_system::Pallet<T>>::block_number();
             ensure!(!votes.is_complete(), Error::<T>::ProposalAlreadyComplete);
             ensure!(!votes.is_expired(now), Error::<T>::ProposalExpired);
 
